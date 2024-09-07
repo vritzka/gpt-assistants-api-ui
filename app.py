@@ -4,6 +4,7 @@ import re
 import json
 
 import streamlit as st
+from urllib.parse import urlparse, parse_qs
 import openai
 from openai import AssistantEventHandler
 from tools import TOOL_MAP
@@ -11,23 +12,44 @@ from typing_extensions import override
 from dotenv import load_dotenv
 import streamlit_authenticator as stauth
 
+
 load_dotenv()
 
+configurations = {
+    "volker": {
+        "openai_api_key": os.environ.get("OPENAI_API_KEY"),
+        "other_var": "SOME_VAR_123"
+    },
+    "456": {
+        "api_key": "API_KEY_FOR_USER_456",
+        "other_var": "SOME_VAR_456"
+    }
+}
 
 def str_to_bool(str_input):
     if not isinstance(str_input, str):
         return False
     return str_input.lower() == "true"
 
+user_id = st.query_params["user_id"] 
+
+# Check if user ID exists in the query and load configuration accordingly
+if user_id and user_id in configurations:
+    user_config = configurations[user_id]
+    openai_api_key = user_config['openai_api_key']
+    #st.write(f"User ID: {user_id}")
+    #st.write(f"Loaded API Key: {user_config['openai_api_key']}")
+else:
+    st.error("Invalid or missing user ID in the query parameter.")
+
 
 # Load environment variables
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-instructions = os.environ.get("RUN_INSTRUCTIONS", "")
+# openai_api_key = os.environ.get("OPENAI_API_KEY")
+instructions = os.environ.get("RUN_INSTRUCTIONS", "Instructions")
 enabled_file_upload_message = os.environ.get(
     "ENABLED_FILE_UPLOAD_MESSAGE", ""
 )
-azure_openai_endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
-azure_openai_key = os.environ.get("AZURE_OPENAI_KEY")
+
 authentication_required = str_to_bool(os.environ.get("AUTHENTICATION_REQUIRED", False))
 
 # Load authentication configuration
@@ -43,14 +65,7 @@ if authentication_required:
         authenticator = None  # No authentication should be performed
 
 client = None
-if azure_openai_endpoint and azure_openai_key:
-    client = openai.AzureOpenAI(
-        api_key=azure_openai_key,
-        api_version="2024-05-01-preview",
-        azure_endpoint=azure_openai_endpoint,
-    )
-else:
-    client = openai.OpenAI(api_key=openai_api_key)
+client = openai.OpenAI(api_key=openai_api_key)
 
 
 class EventHandler(AssistantEventHandler):
