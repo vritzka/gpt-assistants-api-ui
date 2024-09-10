@@ -11,36 +11,31 @@ from tools import TOOL_MAP
 from typing_extensions import override
 from dotenv import load_dotenv
 import streamlit_authenticator as stauth
-
+from sqlalchemy.sql import text
+import requests
 
 load_dotenv()
-
-configurations = {
-    "volker": {
-        "openai_api_key": os.environ.get("OPENAI_API_KEY"),
-        "other_var": "SOME_VAR_123"
-    },
-    "456": {
-        "api_key": "API_KEY_FOR_USER_456",
-        "other_var": "SOME_VAR_456"
-    }
-}
 
 def str_to_bool(str_input):
     if not isinstance(str_input, str):
         return False
     return str_input.lower() == "true"
 
-user_id = st.query_params["user_id"] 
+id = st.query_params["id"]
 
-# Check if user ID exists in the query and load configuration accordingly
-if user_id and user_id in configurations:
-    user_config = configurations[user_id]
-    openai_api_key = user_config['openai_api_key']
-    #st.write(f"User ID: {user_id}")
-    #st.write(f"Loaded API Key: {user_config['openai_api_key']}")
+url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+id
+
+# Send a GET request to the API
+response = requests.get(url, timeout=2)
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Parse the JSON response if it's available
+    response = response.json()
+    openai_api_key = response["response"]["openai_key"]["openai_text"]
 else:
-    st.error("Invalid or missing user ID in the query parameter.")
+    print(f"Failed to retrieve data. Status code: {response.status_code}")
+
 
 
 # Load environment variables

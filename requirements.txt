@@ -5,3 +5,4 @@ openai
 python-dotenv
 streamlit-authenticator
 typing-extensions
+git+https://github.com/streamlit/gsheets-connection

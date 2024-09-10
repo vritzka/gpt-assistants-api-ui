@@ -1,4 +1,5 @@
 {
     "id": "sparkling-leaf-5057",
-    "type": "streamlit"
+    "type": "streamlit",
+    "secret-keys": ["OPENAI_API_KEY"]
 }
