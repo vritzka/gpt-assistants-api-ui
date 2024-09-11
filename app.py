@@ -26,7 +26,7 @@ id = st.query_params["id"]
 url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+id
 
 # Send a GET request to the API
-response = requests.get(url, timeout=2)
+response = requests.get(url, timeout=10)
 
 # Check if the request was successful
 if response.status_code == 200:
@@ -39,7 +39,6 @@ else:
 
 
 # Load environment variables
-# openai_api_key = os.environ.get("OPENAI_API_KEY")
 instructions = os.environ.get("RUN_INSTRUCTIONS", "Instructions")
 enabled_file_upload_message = os.environ.get(
     "ENABLED_FILE_UPLOAD_MESSAGE", ""
