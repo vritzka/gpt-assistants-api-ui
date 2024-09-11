@@ -11,7 +11,6 @@ from tools import TOOL_MAP
 from typing_extensions import override
 from dotenv import load_dotenv
 import streamlit_authenticator as stauth
-from sqlalchemy.sql import text
 import requests
 
 load_dotenv()
@@ -280,7 +279,7 @@ def load_chat_screen(assistant_id, assistant_title):
     else:
         uploaded_file = None
 
-    st.title(assistant_title if assistant_title else "")
+    #st.title(assistant_title if assistant_title else "")
     user_msg = st.chat_input(
         "Message", on_submit=disable_form, disabled=st.session_state.in_progress
     )

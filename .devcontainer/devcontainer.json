@@ -28,6 +28,9 @@
       "onAutoForward": "openPreview"
     }
   },
+    "remoteEnv": {
+      "PLOOMBER_CLOUD_KEY": "Wv4DwKy723tijseNI0qSPU6wViueUYt0cScMBhxEsLQ"
+   },
   "forwardPorts": [
     8501
   ]
