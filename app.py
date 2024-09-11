@@ -59,6 +59,7 @@ if authentication_required:
 
 client = None
 client = openai.OpenAI(api_key=openai_api_key)
+assistant_id = id
 
 
 class EventHandler(AssistantEventHandler):
@@ -318,23 +319,8 @@ def main():
         else:
             authenticator.logout(location="sidebar")
 
-    if multi_agents:
-        assistants_json = json.loads(multi_agents)
-        assistants_object = {f'{obj["title"]}': obj for obj in assistants_json}
-        selected_assistant = st.sidebar.selectbox(
-            "Select an assistant profile?",
-            list(assistants_object.keys()),
-            index=None,
-            placeholder="Select an assistant profile...",
-            on_change=reset_chat,  # Call the reset function on change
-        )
-        if selected_assistant:
-            load_chat_screen(
-                assistants_object[selected_assistant]["id"],
-                assistants_object[selected_assistant]["title"],
-            )
-    elif single_agent_id:
-        load_chat_screen(single_agent_id, single_agent_title)
+    if assistant_id:
+        load_chat_screen(assistant_id, single_agent_title)
     else:
         st.error("No assistant configurations defined in environment variables.")
 
