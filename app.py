@@ -19,8 +19,13 @@ def str_to_bool(str_input):
     if not isinstance(str_input, str):
         return False
     return str_input.lower() == "true"
-    
-unique_id = st.query_params["id"]
+
+if 'id' not in st.query_params:
+    st.error("Missing url parameter: url")
+    st.stop() 
+
+unique_id = st.query_params["id"] 
+
 
 if 'openai_api_key' not in st.session_state:
     # Send a GET request to the API
@@ -37,7 +42,7 @@ if 'openai_api_key' not in st.session_state:
         st.session_state["initial_message_text"] = response["response"]["openai_key"]["initial_message_text"]
     else:
         st.error("Request failed with "+{response.status_code})
-
+        st.stop()
 
     if 'greeted' not in st.session_state:
         st.session_state['greeted'] = True
