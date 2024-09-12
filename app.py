@@ -15,13 +15,23 @@ import requests
 
 load_dotenv() 
 
+hide_streamlit_style = """
+            <style>
+                header {visibility: hidden;}
+                .streamlit-footer {display: none;}
+                .st-emotion-cache-h4xjwg {display: none;}
+            </style>
+            """
+
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 def str_to_bool(str_input):
     if not isinstance(str_input, str):
         return False
     return str_input.lower() == "true"
 
 if 'id' not in st.query_params:
-    st.error("Missing url parameter: url")
+    st.error("Missing url parameter: id")
     st.stop() 
 
 unique_id = st.query_params["id"] 
