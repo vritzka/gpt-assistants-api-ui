@@ -13,16 +13,19 @@ from dotenv import load_dotenv
 import streamlit_authenticator as stauth
 import requests
 
-load_dotenv()
+load_dotenv() 
+
+if 'key' not in st.session_state:
+    st.session_state['greeted'] = True
+    with st.chat_message("assistant"):
+        st.write("Hello, how can I assist you today?")
 
 def str_to_bool(str_input):
     if not isinstance(str_input, str):
         return False
     return str_input.lower() == "true"
-
-id = st.query_params["id"]
-
-url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+id
+unique_id = st.query_params["id"]
+url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+unique_id
 
 # Send a GET request to the API
 response = requests.get(url, timeout=10)
@@ -32,6 +35,7 @@ if response.status_code == 200:
     # Parse the JSON response if it's available
     response = response.json()
     openai_api_key = response["response"]["openai_key"]["openai_text"]
+    chatGPT_assistant_id = response["response"]["openai_key"]["assistant_id_text"]
 else:
     print(f"Failed to retrieve data. Status code: {response.status_code}")
 
@@ -59,7 +63,7 @@ if authentication_required:
 
 client = None
 client = openai.OpenAI(api_key=openai_api_key)
-assistant_id = id
+assistant_id = chatGPT_assistant_id
 
 
 class EventHandler(AssistantEventHandler):
@@ -281,8 +285,13 @@ def load_chat_screen(assistant_id, assistant_title):
         uploaded_file = None
 
     #st.title(assistant_title if assistant_title else "")
+
     user_msg = st.chat_input(
-        "Message", on_submit=disable_form, disabled=st.session_state.in_progress
+        "Message",
+        on_submit=disable_form,
+        disabled=st.session_state.in_progress,
+        max_chars=1024,
+
     )
     if user_msg:
         render_chat()
@@ -320,7 +329,7 @@ def main():
             authenticator.logout(location="sidebar")
 
     if assistant_id:
-        load_chat_screen(assistant_id, single_agent_title)
+        load_chat_screen(assistant_id, single_agent_title)    
     else:
         st.error("No assistant configurations defined in environment variables.")
 
