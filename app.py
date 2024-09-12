@@ -15,31 +15,34 @@ import requests
 
 load_dotenv() 
 
-if 'key' not in st.session_state:
-    st.session_state['greeted'] = True
-    with st.chat_message("assistant"):
-        st.write("Hello, how can I assist you today?")
-
 def str_to_bool(str_input):
     if not isinstance(str_input, str):
         return False
     return str_input.lower() == "true"
+    
 unique_id = st.query_params["id"]
-url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+unique_id
 
-# Send a GET request to the API
-response = requests.get(url, timeout=10)
+if 'openai_api_key' not in st.session_state:
+    # Send a GET request to the API
+    url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+unique_id
+    response = requests.get(url, timeout=10)
 
-# Check if the request was successful
-if response.status_code == 200:
-    # Parse the JSON response if it's available
-    response = response.json()
-    openai_api_key = response["response"]["openai_key"]["openai_text"]
-    chatGPT_assistant_id = response["response"]["openai_key"]["assistant_id_text"]
-else:
-    print(f"Failed to retrieve data. Status code: {response.status_code}")
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the JSON response if it's available
+        response = response.json()
+        #st.write(response)
+        st.session_state["openai_api_key"] = response["response"]["openai_key"]["openai_text"]
+        st.session_state["chatGPT_assistant_id"] = response["response"]["openai_key"]["assistant_id_text"]
+        st.session_state["initial_message_text"] = response["response"]["openai_key"]["initial_message_text"]
+    else:
+        st.error("Request failed with "+{response.status_code})
 
 
+    if 'greeted' not in st.session_state:
+        st.session_state['greeted'] = True
+        with st.chat_message("assistant"):
+            st.write(st.session_state["initial_message_text"])
 
 # Load environment variables
 instructions = os.environ.get("RUN_INSTRUCTIONS", "Instructions")
@@ -62,8 +65,8 @@ if authentication_required:
         authenticator = None  # No authentication should be performed
 
 client = None
-client = openai.OpenAI(api_key=openai_api_key)
-assistant_id = chatGPT_assistant_id
+client = openai.OpenAI(api_key=st.session_state["openai_api_key"])
+assistant_id = st.session_state["chatGPT_assistant_id"]
 
 
 class EventHandler(AssistantEventHandler):
