@@ -44,7 +44,9 @@ else:
 
 if 'openai_api_key' not in st.session_state:
     # Send a GET request to the API
-    url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+unique_id
+    #url = "https://assistembedd.bubbleapps.io/version-test/api/1.1/wf/get-embed?id="+unique_id
+    url = "https://assistor.online/api/1.1/wf/get-embed?id="+unique_id
+
     response = requests.get(url, timeout=10)
 
     # Check if the request was successful
