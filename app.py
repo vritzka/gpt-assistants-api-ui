@@ -35,6 +35,12 @@ if 'id' not in st.query_params:
     st.stop() 
 
 unique_id = st.query_params["id"] 
+if 'initial_greeting' in st.query_params:
+    initial_greeting = st.query_params["initial_greeting"]
+    if initial_greeting == '':
+        initial_greeting = False
+else:
+    initial_greeting = False
 
 if 'openai_api_key' not in st.session_state:
     # Send a GET request to the API
@@ -48,7 +54,6 @@ if 'openai_api_key' not in st.session_state:
         #st.write(response)
         st.session_state["openai_api_key"] = response["response"]["openai_key"]["openai_text"]
         st.session_state["chatGPT_assistant_id"] = response["response"]["openai_key"]["assistant_id_text"]
-        st.session_state["initial_message_text"] = response["response"]["openai_key"]["initial_message_text"]
     else:
         st.error("Request failed with "+{response.status_code})
         st.stop()
@@ -56,8 +61,7 @@ if 'openai_api_key' not in st.session_state:
     if 'greeted' not in st.session_state:
         st.session_state['greeted'] = True
         with st.chat_message("assistant"):
-            st.write(st.session_state["initial_message_text"])
-
+            st.write(initial_greeting)
 # Load environment variables
 instructions = os.environ.get("RUN_INSTRUCTIONS", "Instructions")
 enabled_file_upload_message = os.environ.get(
