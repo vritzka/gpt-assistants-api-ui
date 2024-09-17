@@ -60,8 +60,10 @@ if 'openai_api_key' not in st.session_state:
 
     if 'greeted' not in st.session_state:
         st.session_state['greeted'] = True
-        with st.chat_message("assistant"):
-            st.write(initial_greeting)
+        if initial_greeting:
+            with st.chat_message("assistant"):
+                st.write(initial_greeting)
+                
 # Load environment variables
 instructions = os.environ.get("RUN_INSTRUCTIONS", "Instructions")
 enabled_file_upload_message = os.environ.get(
