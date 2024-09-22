@@ -9,7 +9,7 @@ RUN apt update && \
     pip3 install --upgrade pip && \
     pip3 install poetry && \
     pip install openai && \
-    pip install python-dotenv && /
+    pip install python-dotenv && \
     poetry config virtualenvs.create false && \
     poetry install
 
